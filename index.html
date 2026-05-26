@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Drawer — Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="index">
+
+  <header class="header" role="banner">
+    <a href="index.html" class="header-brand">Drawer</a>
+    <nav class="header-nav" id="headerNav" role="navigation" aria-label="주 메뉴"></nav>
+    <button class="header-menu-btn" id="menuBtn"
+            aria-label="메뉴 열기" aria-expanded="false" aria-controls="mobileMenu">☰</button>
+  </header>
+
+  <nav class="mobile-menu" id="mobileMenu" aria-label="모바일 메뉴"></nav>
+
+  <section class="hero" aria-label="포트폴리오 소개">
+    <div class="hero-content">
+      <h1 class="hero-name">PORTFOLIO</h1>
+      <p class="hero-role">Product designer</p>
+      <p class="hero-desc">공공·금융·통신 운영 UI를 디자인합니다.<br>대시보드, 3D, AI 자동화 작업을 모아둡니다.</p>
+      <p class="hero-meta"></p>
+    </div>
+  </section>
+
+  <main class="gallery" id="gallery" aria-label="전체 작업물 그리드"></main>
+  <div class="empty-state" id="emptyState" hidden></div>
+
+  <footer class="footer">© Drawer · noindex</footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

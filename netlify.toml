@@ -1,0 +1,12 @@
+[build]
+  command = "python3 build/build.py"
+  publish = "."
+
+[build.environment]
+  PYTHON_VERSION = "3.11"
+
+# noindex 헤더 — 검색엔진 차단
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"

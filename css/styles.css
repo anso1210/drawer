@@ -1,0 +1,408 @@
+/* ============================================
+   Drawer — Portfolio
+   NDS Tokens · 시안 단계 (정식 빌드 시 tokens.json → tokens.css)
+   ============================================ */
+
+:root {
+  --bg:        #FAFAFA;
+  --surface:   #FFFFFF;
+  --elevated:  #F4F4F5;
+
+  --text-primary:   #111111;
+  --text-secondary: #666666;
+  --text-tertiary:  #999999;
+
+  --border:        rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.15);
+
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Pretendard',
+               'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+  --font-display: 'Montserrat', -apple-system, BlinkMacSystemFont,
+                  'Pretendard', system-ui, sans-serif;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
+/* Hero gradient color slots */
+@property --grad-c1 { syntax: '<color>'; inherits: false; initial-value: #6B82E8; }
+@property --grad-c2 { syntax: '<color>'; inherits: false; initial-value: #A78BFA; }
+@property --grad-c3 { syntax: '<color>'; inherits: false; initial-value: #F0ABFC; }
+@property --grad-accent { syntax: '<color>'; inherits: false; initial-value: #C5DAA0; }
+
+/* Reset & Base */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+}
+a { color: inherit; }
+[hidden] { display: none !important; }
+
+/* ============================================
+   Header
+   ============================================ */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 32px;
+  border-bottom: 0.5px solid var(--border);
+  background: var(--surface);
+}
+.header-brand {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+.header-nav {
+  display: flex;
+  gap: 28px;
+  font-size: 13px;
+}
+.header-nav a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 150ms ease-out;
+}
+.header-nav a:hover { color: var(--text-primary); }
+.header-nav a.active {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.header-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  padding: 4px 6px;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+/* Mobile menu */
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  background: var(--surface);
+  border-bottom: 0.5px solid var(--border);
+}
+.mobile-menu.open { display: flex; }
+.mobile-menu a {
+  padding: 14px 18px;
+  font-size: 14px;
+  color: var(--text-primary);
+  text-decoration: none;
+  border-top: 0.5px solid var(--border);
+}
+.mobile-menu a:first-child { border-top: none; }
+.mobile-menu a.active { font-weight: 500; }
+
+/* ============================================
+   Hero (index 전용)
+   ============================================ */
+.hero {
+  position: relative;
+  padding: 96px 32px 72px;
+  border-bottom: 0.5px solid var(--border);
+  background:
+    radial-gradient(ellipse 50% 80% at 80% 30%, var(--grad-c1), transparent 65%),
+    radial-gradient(ellipse 60% 70% at 100% 75%, var(--grad-c2), transparent 65%),
+    radial-gradient(ellipse 70% 60% at 95% 50%, var(--grad-c3), transparent 70%),
+    #F5F5F7;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 360px;
+  transition:
+    --grad-c1 0.9s cubic-bezier(0.4, 0, 0.2, 1),
+    --grad-c2 0.9s cubic-bezier(0.4, 0, 0.2, 1),
+    --grad-c3 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: -10% -15% -10% -20%;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(
+    ellipse 240px 180px at 22% 78%,
+    var(--grad-accent),
+    transparent 70%
+  );
+  animation: hero-accent-drift 22s ease-in-out infinite;
+  transition: background 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+@keyframes hero-accent-drift {
+  0%   { transform: translate(0, 0); }
+  20%  { transform: translate(70px, -50px); }
+  40%  { transform: translate(-30px, -80px); }
+  60%  { transform: translate(50px, -20px); }
+  80%  { transform: translate(-40px, -40px); }
+  100% { transform: translate(0, 0); }
+}
+.hero-content { position: relative; z-index: 1; }
+.hero-name {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 6vw, 80px);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin: 0 0 16px;
+}
+.hero-role {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0 0 20px;
+}
+.hero-desc {
+  font-size: clamp(14px, 1.4vw, 16px);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.7;
+  max-width: 520px;
+}
+.hero-meta {
+  margin-top: 24px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+}
+
+/* ============================================
+   Page head (dashboard / 3d / ai-app / about 공통)
+   ============================================ */
+.page-head {
+  padding: 56px 32px 24px;
+  border-bottom: 0.5px solid var(--border);
+}
+.page-head h1 {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.6vw, 44px);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin: 0 0 10px;
+}
+.page-head .page-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+  max-width: 560px;
+  line-height: 1.6;
+}
+.page-head .page-meta {
+  margin-top: 12px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+}
+
+/* ============================================
+   Gallery
+   ============================================ */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  padding: 32px;
+}
+.thumb {
+  aspect-ratio: 16 / 9;
+  background: var(--elevated);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: opacity 150ms ease-out;
+}
+.thumb:hover { opacity: 0.92; }
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Empty state (이미지 없는 카테고리) */
+.empty-state {
+  padding: 80px 32px;
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 13px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+
+/* ============================================
+   AI App list (이미지 없음, 텍스트만)
+   ============================================ */
+.list {
+  padding: 16px 32px 48px;
+  max-width: 880px;
+}
+.list-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
+  padding: 28px 0;
+  border-bottom: 0.5px solid var(--border);
+  align-items: start;
+}
+.list-item:last-child { border-bottom: none; }
+.list-name {
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0 0 6px;
+  color: var(--text-primary);
+}
+.list-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+  max-width: 620px;
+}
+.list-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.list-actions a {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 6px 12px;
+  border: 0.5px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  transition: all 150ms ease-out;
+  white-space: nowrap;
+}
+.list-actions a:hover {
+  color: var(--text-primary);
+  border-color: var(--text-primary);
+}
+
+/* ============================================
+   About — 좌·우 두 열, 모바일 1열 스택
+   ============================================ */
+.about {
+  padding: 24px 32px 80px;
+  max-width: 960px;
+}
+.about-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 32px;
+  padding: 24px 0;
+  border-top: 0.5px solid var(--border);
+}
+.about-row:first-child { border-top: none; }
+.about-label {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-family: var(--font-mono);
+  padding-top: 2px;
+}
+.about-body {
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+.about-body .name {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.4vw, 40px);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0 0 8px;
+}
+.about-body p { margin: 0 0 10px; }
+.about-body p:last-child { margin-bottom: 0; }
+.about-body ul { list-style: none; padding: 0; margin: 0; }
+.about-body ul li {
+  padding: 6px 0;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+.about-body .tool-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+.about-body .tool-tags span {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  padding: 4px 10px;
+  background: var(--elevated);
+  border-radius: var(--radius-sm);
+}
+
+/* Footer */
+.footer {
+  padding: 32px;
+  border-top: 0.5px solid var(--border);
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+  text-align: center;
+}
+
+/* Breakpoints */
+@media (max-width: 1279px) {
+  .gallery { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 767px) {
+  .header { padding: 14px 18px; }
+  .header-nav { display: none; }
+  .header-menu-btn { display: block; }
+  .hero {
+    padding: 64px 18px 48px;
+    min-height: 280px;
+  }
+  .page-head { padding: 40px 18px 20px; }
+  .gallery {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    padding: 18px;
+  }
+  .list { padding: 12px 18px 40px; }
+  .list-item {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .list-actions { justify-content: flex-start; }
+  .about { padding: 18px 18px 60px; }
+  .about-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .footer { padding: 24px 18px; }
+}
