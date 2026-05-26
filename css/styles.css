@@ -1,26 +1,31 @@
 /* ============================================
    Drawer — Portfolio
-   NDS Tokens · 시안 단계 (정식 빌드 시 tokens.json → tokens.css)
+   NDS Tokens · Dark-first
    ============================================ */
 
 :root {
-  --bg:        #FAFAFA;
-  --surface:   #FFFFFF;
-  --elevated:  #F4F4F5;
+  /* Surface — 3 layer (Dark) */
+  --bg:        #0A0A0B;
+  --surface:   #141416;
+  --elevated:  #1E1E21;
 
-  --text-primary:   #111111;
-  --text-secondary: #666666;
-  --text-tertiary:  #999999;
+  /* Text */
+  --text-primary:   #FAFAFA;
+  --text-secondary: #A1A1AA;
+  --text-tertiary:  #71717A;
 
-  --border:        rgba(0, 0, 0, 0.08);
-  --border-strong: rgba(0, 0, 0, 0.15);
+  /* Border */
+  --border:        rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.16);
 
+  /* Type */
   --font-sans: -apple-system, BlinkMacSystemFont, 'Pretendard',
                'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
   --font-mono: 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
   --font-display: 'Montserrat', -apple-system, BlinkMacSystemFont,
                   'Pretendard', system-ui, sans-serif;
 
+  /* Radius */
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
@@ -35,6 +40,7 @@
 /* Reset & Base */
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
+html { color-scheme: dark; }
 body {
   font-family: var(--font-sans);
   color: var(--text-primary);
@@ -58,7 +64,9 @@ a { color: inherit; }
   justify-content: space-between;
   padding: 18px 32px;
   border-bottom: 0.5px solid var(--border);
-  background: var(--surface);
+  background: rgba(10, 10, 11, 0.85);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
 }
 .header-brand {
   font-size: 14px;
@@ -112,7 +120,7 @@ a { color: inherit; }
 .mobile-menu a.active { font-weight: 500; }
 
 /* ============================================
-   Hero (index 전용)
+   Hero (index 전용) — gradient on dark
    ============================================ */
 .hero {
   position: relative;
@@ -122,7 +130,7 @@ a { color: inherit; }
     radial-gradient(ellipse 50% 80% at 80% 30%, var(--grad-c1), transparent 65%),
     radial-gradient(ellipse 60% 70% at 100% 75%, var(--grad-c2), transparent 65%),
     radial-gradient(ellipse 70% 60% at 95% 50%, var(--grad-c3), transparent 70%),
-    #F5F5F7;
+    #18181B;
   isolation: isolate;
   overflow: hidden;
   min-height: 360px;
@@ -162,15 +170,17 @@ a { color: inherit; }
   letter-spacing: -0.02em;
   line-height: 1;
   margin: 0 0 16px;
+  color: #FFFFFF;
+  mix-blend-mode: normal;
 }
 .hero-role {
   font-size: 14px;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.78);
   margin: 0 0 20px;
 }
 .hero-desc {
   font-size: clamp(14px, 1.4vw, 16px);
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.72);
   margin: 0;
   line-height: 1.7;
   max-width: 520px;
@@ -178,7 +188,7 @@ a { color: inherit; }
 .hero-meta {
   margin-top: 24px;
   font-size: 11px;
-  color: var(--text-tertiary);
+  color: rgba(255, 255, 255, 0.5);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -186,7 +196,7 @@ a { color: inherit; }
 }
 
 /* ============================================
-   Page head (dashboard / 3d / ai-app / about 공통)
+   Page head
    ============================================ */
 .page-head {
   padding: 56px 32px 24px;
@@ -199,6 +209,7 @@ a { color: inherit; }
   letter-spacing: -0.02em;
   line-height: 1.05;
   margin: 0 0 10px;
+  color: var(--text-primary);
 }
 .page-head .page-desc {
   font-size: 14px;
@@ -218,7 +229,7 @@ a { color: inherit; }
 }
 
 /* ============================================
-   Gallery
+   Gallery — grid view
    ============================================ */
 .gallery {
   display: grid;
@@ -227,13 +238,18 @@ a { color: inherit; }
   padding: 32px;
 }
 .thumb {
+  display: block;
   aspect-ratio: 16 / 9;
   background: var(--elevated);
   border-radius: var(--radius-md);
   overflow: hidden;
-  transition: opacity 150ms ease-out;
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1), opacity 150ms ease-out;
+  border: 0.5px solid var(--border);
 }
-.thumb:hover { opacity: 0.92; }
+.thumb:hover {
+  opacity: 0.95;
+  transform: translateY(-2px);
+}
 .thumb img {
   width: 100%;
   height: 100%;
@@ -241,7 +257,7 @@ a { color: inherit; }
   display: block;
 }
 
-/* Empty state (이미지 없는 카테고리) */
+/* Empty state */
 .empty-state {
   padding: 80px 32px;
   text-align: center;
@@ -252,40 +268,68 @@ a { color: inherit; }
 }
 
 /* ============================================
-   AI App list (이미지 없음, 텍스트만)
+   List view (AI App) — 썸네일 + 제목 + 설명 + 액션
    ============================================ */
 .list {
   padding: 16px 32px 48px;
-  max-width: 880px;
+  max-width: 1100px;
 }
 .list-item {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 24px;
+  grid-template-columns: 300px 1fr;
+  gap: 32px;
   padding: 28px 0;
   border-bottom: 0.5px solid var(--border);
   align-items: start;
 }
+.list-item:first-child {
+  padding-top: 32px;
+}
 .list-item:last-child { border-bottom: none; }
+
+.list-thumb {
+  display: block;
+  aspect-ratio: 16 / 9;
+  background: var(--elevated);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 0.5px solid var(--border);
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.list-thumb:hover { transform: translateY(-2px); }
+.list-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.list-thumb-placeholder {
+  aspect-ratio: 16 / 9;
+  background: var(--elevated);
+  border-radius: var(--radius-md);
+  border: 0.5px solid var(--border);
+}
+
+.list-body { min-width: 0; }
 .list-name {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 500;
   letter-spacing: -0.01em;
-  margin: 0 0 6px;
+  margin: 0 0 8px;
   color: var(--text-primary);
 }
 .list-desc {
   font-size: 14px;
   color: var(--text-secondary);
-  margin: 0;
-  line-height: 1.6;
+  margin: 0 0 16px;
+  line-height: 1.65;
   max-width: 620px;
 }
+.list-desc:empty { display: none; }
 .list-actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
-  justify-content: flex-end;
 }
 .list-actions a {
   font-size: 12px;
@@ -301,10 +345,11 @@ a { color: inherit; }
 .list-actions a:hover {
   color: var(--text-primary);
   border-color: var(--text-primary);
+  background: var(--elevated);
 }
 
 /* ============================================
-   About — 좌·우 두 열, 모바일 1열 스택
+   About
    ============================================ */
 .about {
   padding: 24px 32px 80px;
@@ -360,6 +405,7 @@ a { color: inherit; }
   padding: 4px 10px;
   background: var(--elevated);
   border-radius: var(--radius-sm);
+  border: 0.5px solid var(--border);
 }
 
 /* Footer */
@@ -396,9 +442,10 @@ a { color: inherit; }
   .list { padding: 12px 18px 40px; }
   .list-item {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 14px;
+    padding: 20px 0;
   }
-  .list-actions { justify-content: flex-start; }
+  .list-thumb { max-width: 100%; }
   .about { padding: 18px 18px 60px; }
   .about-row {
     grid-template-columns: 1fr;

@@ -25,13 +25,12 @@
 })();
 
 
-/* ---------- 메뉴 (동적) ---------- */
+/* ---------- 메뉴 ---------- */
 
 function renderMenu(manifest, currentPage) {
   const header = document.getElementById('headerNav');
   const mobile = document.getElementById('mobileMenu');
 
-  // 동적 카테고리 + 정적 About
   const items = manifest.categories.map(c => {
     const slug = c.url.replace(/\.html$/, '');
     return {
@@ -62,17 +61,16 @@ function renderMenu(manifest, currentPage) {
 }
 
 
-/* ---------- 콘텐츠 (그리드 / 리스트 / empty) ---------- */
+/* ---------- 콘텐츠 ---------- */
 
 function renderContent(manifest, page) {
   const gallery = document.getElementById('gallery');
   const list = document.getElementById('list');
   const emptyEl = document.getElementById('emptyState');
 
-  if (page === 'about') return; // 정적
+  if (page === 'about') return;
 
   if (page === 'index') {
-    // 모든 grid 카테고리 합침
     const items = manifest.categories
       .filter(c => c.view === 'grid')
       .flatMap(c => c.items.map(rel => ({
@@ -88,17 +86,16 @@ function renderContent(manifest, page) {
     return;
   }
 
-  // 카테고리 페이지
   const cat = findCategory(manifest, page);
   if (!cat) {
     hide(gallery); hide(list);
-    showEmpty(`'${page}' 카테고리를 찾을 수 없습니다. img/ 폴더와 페이지 이름이 일치하는지 확인하세요.`, emptyEl);
+    showEmpty(`'${page}' 카테고리를 찾을 수 없습니다.`, emptyEl);
     return;
   }
 
   if (cat.view === 'list') {
     hide(gallery);
-    renderList(list, cat.items);
+    renderList(list, cat.items, cat.id);
     if (cat.items.length === 0) showEmpty('항목이 없습니다.', emptyEl);
   } else {
     hide(list);
@@ -120,7 +117,7 @@ function findCategory(manifest, page) {
 }
 
 
-/* ---------- 페이지 메타 (item count 등) ---------- */
+/* ---------- 메타 ---------- */
 
 function updateMeta(manifest, page) {
   const metaEl = document.querySelector('.hero-meta, .page-meta');
@@ -129,7 +126,7 @@ function updateMeta(manifest, page) {
   if (page === 'index') {
     metaEl.textContent = `${manifest.totalItems} items`;
   } else if (page === 'about') {
-    // 정적
+    return;
   } else {
     const cat = findCategory(manifest, page);
     if (cat) {
@@ -152,22 +149,33 @@ function renderGrid(container, items) {
   `).join('');
 }
 
-function renderList(container, items) {
+function renderList(container, items, categoryId) {
   if (!container) return;
   container.hidden = false;
-  container.innerHTML = items.map(item => `
-    <article class="list-item">
-      <div>
-        <h2 class="list-name">${escapeHtml(item.name || '')}</h2>
-        <p class="list-desc">${escapeHtml(item.desc || '')}</p>
-      </div>
-      <div class="list-actions">
-        ${(item.links || []).map(l => `
-          <a href="${escapeAttr(l.url)}" target="_blank" rel="noopener">${escapeHtml(l.label)}</a>
-        `).join('')}
-      </div>
-    </article>
-  `).join('');
+  container.innerHTML = items.map(item => {
+    const thumbHtml = item.thumb
+      ? `<a class="list-thumb" href="img/${escapeAttr(categoryId)}/${escapeAttr(item.thumb)}" target="_blank" rel="noopener" aria-label="${escapeAttr(item.name || '')}">
+           <img src="img/${escapeAttr(categoryId)}/${escapeAttr(item.thumb)}" alt="${escapeAttr(item.name || '')}" loading="lazy">
+         </a>`
+      : `<div class="list-thumb-placeholder" aria-hidden="true"></div>`;
+
+    const actionsHtml = (item.links && item.links.length > 0)
+      ? `<div class="list-actions">
+           ${item.links.map(l => `<a href="${escapeAttr(l.url)}" target="_blank" rel="noopener">${escapeHtml(l.label)}</a>`).join('')}
+         </div>`
+      : '';
+
+    return `
+      <article class="list-item">
+        ${thumbHtml}
+        <div class="list-body">
+          <h2 class="list-name">${escapeHtml(item.name || '')}</h2>
+          <p class="list-desc">${escapeHtml(item.desc || '')}</p>
+          ${actionsHtml}
+        </div>
+      </article>
+    `;
+  }).join('');
 }
 
 function showEmpty(message, el) {
@@ -218,7 +226,6 @@ function escapeAttr(s) { return escapeHtml(s); }
 
 /* ============================================
    Hero gradient hover (index 전용)
-   메인 팔레트 × 액센트 풀 독립 랜덤
    ============================================ */
 (function () {
   const hero = document.querySelector('.hero');
