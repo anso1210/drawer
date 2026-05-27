@@ -197,10 +197,16 @@ function renderList(container, items, categoryId) {
     `;
   }).join('');
 
-  // 아코디언 토글 바인딩
+  // 아코디언 토글 바인딩 (한 번에 하나만 열림)
   container.querySelectorAll('.list-head').forEach(btn => {
     btn.addEventListener('click', () => {
       const item = btn.closest('.list-item');
+      container.querySelectorAll('.list-item.expanded').forEach(el => {
+        if (el !== item) {
+          el.classList.remove('expanded');
+          el.querySelector('.list-head').setAttribute('aria-expanded', 'false');
+        }
+      });
       const expanded = item.classList.toggle('expanded');
       btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
     });
