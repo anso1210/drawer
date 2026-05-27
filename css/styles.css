@@ -4,40 +4,33 @@
    ============================================ */
 
 :root {
-  /* Surface — 3 layer (Dark) */
   --bg:        #0A0A0B;
   --surface:   #141416;
   --elevated:  #1E1E21;
 
-  /* Text */
   --text-primary:   #FAFAFA;
   --text-secondary: #A1A1AA;
   --text-tertiary:  #71717A;
 
-  /* Border */
   --border:        rgba(255, 255, 255, 0.07);
   --border-strong: rgba(255, 255, 255, 0.16);
 
-  /* Type */
   --font-sans: -apple-system, BlinkMacSystemFont, 'Pretendard',
                'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
   --font-mono: 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
   --font-display: 'Montserrat', -apple-system, BlinkMacSystemFont,
                   'Pretendard', system-ui, sans-serif;
 
-  /* Radius */
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
 }
 
-/* Hero gradient color slots */
 @property --grad-c1 { syntax: '<color>'; inherits: false; initial-value: #6B82E8; }
 @property --grad-c2 { syntax: '<color>'; inherits: false; initial-value: #A78BFA; }
 @property --grad-c3 { syntax: '<color>'; inherits: false; initial-value: #F0ABFC; }
 @property --grad-accent { syntax: '<color>'; inherits: false; initial-value: #C5DAA0; }
 
-/* Reset & Base */
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 html { color-scheme: dark; }
@@ -101,7 +94,6 @@ a { color: inherit; }
   cursor: pointer;
 }
 
-/* Mobile menu */
 .mobile-menu {
   display: none;
   flex-direction: column;
@@ -120,7 +112,7 @@ a { color: inherit; }
 .mobile-menu a.active { font-weight: 500; }
 
 /* ============================================
-   Hero (index 전용) — gradient on dark
+   Hero
    ============================================ */
 .hero {
   position: relative;
@@ -171,7 +163,6 @@ a { color: inherit; }
   line-height: 1;
   margin: 0 0 16px;
   color: #FFFFFF;
-  mix-blend-mode: normal;
 }
 .hero-role {
   font-size: 14px;
@@ -229,7 +220,8 @@ a { color: inherit; }
 }
 
 /* ============================================
-   Gallery — grid view
+   Gallery — grid view (Dashboard, 3D)
+   썸네일 클릭/우클릭/드래그 모두 비활성 (보안 의도)
    ============================================ */
 .gallery {
   display: grid;
@@ -243,18 +235,23 @@ a { color: inherit; }
   background: var(--elevated);
   border-radius: var(--radius-md);
   overflow: hidden;
-  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1), opacity 150ms ease-out;
   border: 0.5px solid var(--border);
+  cursor: default;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  transition: opacity 150ms ease-out;
 }
-.thumb:hover {
-  opacity: 0.95;
-  transform: translateY(-2px);
-}
+.thumb:hover { opacity: 0.92; }
 .thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+  pointer-events: none;
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 /* Empty state */
@@ -268,40 +265,60 @@ a { color: inherit; }
 }
 
 /* ============================================
-   List view (AI App) — 썸네일 + 제목 + 설명 + 액션
+   List view (AI App) — 아코디언 형식
+   썸네일 행 클릭 → 아래로 확대 이미지 + 상세 설명 펼침
    ============================================ */
 .list {
   padding: 16px 32px 48px;
   max-width: 1100px;
 }
 .list-item {
-  display: grid;
-  grid-template-columns: 300px 1fr;
-  gap: 32px;
-  padding: 28px 0;
   border-bottom: 0.5px solid var(--border);
-  align-items: start;
-}
-.list-item:first-child {
-  padding-top: 32px;
 }
 .list-item:last-child { border-bottom: none; }
 
+/* 헤더 행: 클릭 가능. 썸네일 + 제목/설명 */
+.list-head {
+  display: grid;
+  grid-template-columns: 300px 1fr auto;
+  gap: 32px;
+  padding: 28px 0;
+  align-items: center;
+  cursor: pointer;
+  transition: background 150ms ease-out;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+}
+.list-head:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+.list-head:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: -2px;
+  border-radius: var(--radius-sm);
+}
+
 .list-thumb {
-  display: block;
   aspect-ratio: 16 / 9;
   background: var(--elevated);
   border-radius: var(--radius-md);
   overflow: hidden;
   border: 0.5px solid var(--border);
-  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
 }
-.list-thumb:hover { transform: translateY(-2px); }
 .list-thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+  pointer-events: none;
+  -webkit-user-drag: none;
 }
 .list-thumb-placeholder {
   aspect-ratio: 16 / 9;
@@ -321,15 +338,72 @@ a { color: inherit; }
 .list-desc {
   font-size: 14px;
   color: var(--text-secondary);
-  margin: 0 0 16px;
+  margin: 0;
   line-height: 1.65;
   max-width: 620px;
 }
 .list-desc:empty { display: none; }
+
+/* 펼침 토글 아이콘 (chevron) */
+.list-toggle {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.list-item.expanded .list-toggle {
+  transform: rotate(180deg);
+}
+.list-toggle svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+/* 펼침 패널 */
+.list-panel {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.list-item.expanded .list-panel {
+  max-height: 2400px;
+}
+.list-panel-inner {
+  padding: 8px 0 36px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  max-width: 920px;
+}
+.list-image-full {
+  width: 100%;
+  background: var(--elevated);
+  border-radius: var(--radius-md);
+  border: 0.5px solid var(--border);
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  pointer-events: none;
+}
+.list-long-desc {
+  font-size: 15px;
+  color: var(--text-primary);
+  line-height: 1.75;
+  margin: 0;
+  white-space: pre-wrap;
+  max-width: 720px;
+}
+.list-long-desc:empty { display: none; }
 .list-actions {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  margin-top: 4px;
 }
 .list-actions a {
   font-size: 12px;
@@ -440,16 +514,24 @@ a { color: inherit; }
     padding: 18px;
   }
   .list { padding: 12px 18px 40px; }
-  .list-item {
-    grid-template-columns: 1fr;
-    gap: 14px;
+  .list-head {
+    grid-template-columns: 100px 1fr 24px;
+    gap: 16px;
     padding: 20px 0;
   }
-  .list-thumb { max-width: 100%; }
+  .list-name { font-size: 16px; }
+  .list-desc { font-size: 13px; }
   .about { padding: 18px 18px 60px; }
   .about-row {
     grid-template-columns: 1fr;
     gap: 8px;
   }
   .footer { padding: 24px 18px; }
+}
+
+/* 전체 이미지 우클릭 방지 (보안 의도, 결정적이지는 않음) */
+img {
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  user-select: none;
 }

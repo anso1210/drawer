@@ -3,6 +3,8 @@
    1. manifest.json 로드 → 메뉴/콘텐츠 동적 렌더
    2. 모바일 메뉴 토글
    3. Hero 그라데이션 hover 인터랙션 (index 전용)
+   4. AI App 아코디언 토글
+   5. 그리드 이미지 우클릭/드래그 방지 (보안 의도)
    ============================================ */
 
 (async function () {
@@ -33,17 +35,9 @@ function renderMenu(manifest, currentPage) {
 
   const items = manifest.categories.map(c => {
     const slug = c.url.replace(/\.html$/, '');
-    return {
-      label: c.label,
-      url: c.url,
-      active: slug === currentPage,
-    };
+    return { label: c.label, url: c.url, active: slug === currentPage };
   });
-  items.push({
-    label: 'About',
-    url: 'about.html',
-    active: currentPage === 'about',
-  });
+  items.push({ label: 'About', url: 'about.html', active: currentPage === 'about' });
 
   if (header) {
     header.innerHTML = items.map(i =>
@@ -122,7 +116,6 @@ function findCategory(manifest, page) {
 function updateMeta(manifest, page) {
   const metaEl = document.querySelector('.hero-meta, .page-meta');
   if (!metaEl) return;
-
   if (page === 'index') {
     metaEl.textContent = `${manifest.totalItems} items`;
   } else if (page === 'about') {
@@ -139,43 +132,76 @@ function updateMeta(manifest, page) {
 
 /* ---------- 렌더 헬퍼 ---------- */
 
+/* Grid view (Dashboard, 3D, index) — <a> 대신 <div>로 렌더해서 클릭 비활성 */
 function renderGrid(container, items) {
   if (!container) return;
   container.hidden = false;
   container.innerHTML = items.map(item => `
-    <a class="thumb" href="${escapeAttr(item.src)}" target="_blank" rel="noopener" aria-label="${escapeAttr(item.alt)}">
-      <img src="${escapeAttr(item.src)}" alt="${escapeAttr(item.alt)}" loading="lazy">
-    </a>
+    <div class="thumb" role="img" aria-label="${escapeAttr(item.alt)}">
+      <img src="${escapeAttr(item.src)}" alt="${escapeAttr(item.alt)}" loading="lazy" draggable="false">
+    </div>
   `).join('');
 }
 
+/* List view (AI App) — 아코디언 */
 function renderList(container, items, categoryId) {
   if (!container) return;
   container.hidden = false;
-  container.innerHTML = items.map(item => {
-    const thumbHtml = item.thumb
-      ? `<a class="list-thumb" href="img/${escapeAttr(categoryId)}/${escapeAttr(item.thumb)}" target="_blank" rel="noopener" aria-label="${escapeAttr(item.name || '')}">
-           <img src="img/${escapeAttr(categoryId)}/${escapeAttr(item.thumb)}" alt="${escapeAttr(item.name || '')}" loading="lazy">
-         </a>`
+  container.innerHTML = items.map((item, i) => {
+    const thumbSrc = item.thumb ? `img/${categoryId}/${item.thumb}` : null;
+    const thumbHtml = thumbSrc
+      ? `<div class="list-thumb">
+           <img src="${escapeAttr(thumbSrc)}" alt="${escapeAttr(item.name || '')}" loading="lazy" draggable="false">
+         </div>`
       : `<div class="list-thumb-placeholder" aria-hidden="true"></div>`;
 
+    const longDesc = (item.longDesc || '').trim();
+    const fullImage = thumbSrc
+      ? `<img class="list-image-full" src="${escapeAttr(thumbSrc)}" alt="${escapeAttr(item.name || '')}" loading="lazy" draggable="false">`
+      : '';
+    const longDescHtml = longDesc
+      ? `<p class="list-long-desc">${escapeHtml(longDesc)}</p>`
+      : '';
     const actionsHtml = (item.links && item.links.length > 0)
       ? `<div class="list-actions">
            ${item.links.map(l => `<a href="${escapeAttr(l.url)}" target="_blank" rel="noopener">${escapeHtml(l.label)}</a>`).join('')}
          </div>`
       : '';
 
+    const panelId = `panel-${i}`;
     return `
-      <article class="list-item">
-        ${thumbHtml}
-        <div class="list-body">
-          <h2 class="list-name">${escapeHtml(item.name || '')}</h2>
-          <p class="list-desc">${escapeHtml(item.desc || '')}</p>
-          ${actionsHtml}
+      <article class="list-item" data-index="${i}">
+        <button class="list-head" type="button" aria-expanded="false" aria-controls="${panelId}">
+          ${thumbHtml}
+          <div class="list-body">
+            <h2 class="list-name">${escapeHtml(item.name || '')}</h2>
+            <p class="list-desc">${escapeHtml(item.desc || '')}</p>
+          </div>
+          <span class="list-toggle" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 6L8 11L13 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </button>
+        <div class="list-panel" id="${panelId}" role="region">
+          <div class="list-panel-inner">
+            ${fullImage}
+            ${longDescHtml}
+            ${actionsHtml}
+          </div>
         </div>
       </article>
     `;
   }).join('');
+
+  // 아코디언 토글 바인딩
+  container.querySelectorAll('.list-head').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.list-item');
+      const expanded = item.classList.toggle('expanded');
+      btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    });
+  });
 }
 
 function showEmpty(message, el) {
@@ -184,9 +210,7 @@ function showEmpty(message, el) {
   el.textContent = message;
   el.hidden = false;
 }
-
 function hide(el) { if (el) el.hidden = true; }
-
 function escapeHtml(s) {
   return String(s == null ? '' : s)
     .replace(/&/g, '&amp;')
@@ -205,14 +229,12 @@ function escapeAttr(s) { return escapeHtml(s); }
   const btn = document.getElementById('menuBtn');
   const menu = document.getElementById('mobileMenu');
   if (!btn || !menu) return;
-
   btn.addEventListener('click', () => {
     const open = menu.classList.toggle('open');
     btn.setAttribute('aria-expanded', open ? 'true' : 'false');
     btn.textContent = open ? '×' : '☰';
     btn.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
   });
-
   window.addEventListener('resize', () => {
     if (window.innerWidth > 767 && menu.classList.contains('open')) {
       menu.classList.remove('open');
@@ -230,7 +252,6 @@ function escapeAttr(s) { return escapeHtml(s); }
 (function () {
   const hero = document.querySelector('.hero');
   if (!hero) return;
-
   const mainPalettes = [
     ['#6B82E8', '#A78BFA', '#F0ABFC'],
     ['#FB7185', '#FBA374', '#FCD34D'],
@@ -246,7 +267,6 @@ function escapeAttr(s) { return escapeHtml(s); }
     '#C8B5E5', '#D5E0A0', '#F5C0A8', '#A0D5B8',
     '#E0C0E5', '#F0E5A0', '#B0D5E0', '#E5B5C0',
   ];
-
   let lastMain = -1, lastAcc = -1;
   hero.addEventListener('mouseenter', () => {
     let i, j;
@@ -259,5 +279,25 @@ function escapeAttr(s) { return escapeHtml(s); }
     hero.style.setProperty('--grad-c2', c2);
     hero.style.setProperty('--grad-c3', c3);
     hero.style.setProperty('--grad-accent', accents[j]);
+  });
+})();
+
+
+/* ============================================
+   이미지 보호 (보안 의도, 결정적이지는 않음)
+   - 우클릭 컨텍스트 메뉴 차단
+   - 드래그 차단
+   - DevTools로 우회는 막을 수 없음 → 워터마크 권장
+   ============================================ */
+(function () {
+  document.addEventListener('contextmenu', (e) => {
+    if (e.target && e.target.tagName === 'IMG') {
+      e.preventDefault();
+    }
+  });
+  document.addEventListener('dragstart', (e) => {
+    if (e.target && e.target.tagName === 'IMG') {
+      e.preventDefault();
+    }
   });
 })();

@@ -94,25 +94,29 @@
           "thumb": "01-jobposting.png",
           "name": "Jobposting",
           "desc": "",
-          "links": []
+          "links": [],
+          "longDesc": ""
         },
         {
           "thumb": "02-exceltohtml.png",
           "name": "Exceltohtml",
           "desc": "",
-          "links": []
+          "links": [],
+          "longDesc": ""
         },
         {
           "thumb": "03-heatmap.png",
           "name": "Heatmap",
           "desc": "",
-          "links": []
+          "links": [],
+          "longDesc": ""
         },
         {
           "thumb": "04-valueheatmap.png",
           "name": "Valueheatmap",
           "desc": "",
-          "links": []
+          "links": [],
+          "longDesc": ""
         }
       ]
     }

@@ -96,7 +96,28 @@ def scan_images(folder: Path):
 
 def load_items_json(path: Path):
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        items = json.loads(path.read_text(encoding="utf-8"))
+        # 기존 items에 longDesc 필드 누락된 경우 자동 추가 (마이그레이션)
+        changed = False
+        if isinstance(items, list):
+            for item in items:
+                if isinstance(item, dict):
+                    if "longDesc" not in item:
+                        item["longDesc"] = ""
+                        changed = True
+                    if "desc" not in item:
+                        item["desc"] = ""
+                        changed = True
+                    if "links" not in item:
+                        item["links"] = []
+                        changed = True
+        if changed:
+            path.write_text(
+                json.dumps(items, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            print(f"  ↻ items.json 마이그레이션 ({path.parent.name}): longDesc 필드 추가")
+        return items
     except Exception as e:
         print(f"  warning: items.json 파싱 실패 ({path.name}): {e}", file=sys.stderr)
         return []
@@ -110,6 +131,7 @@ def autogen_items_for_ai_app(folder: Path, images: list) -> list:
             "thumb": img_rel,
             "name": name_from_filename(img_rel),
             "desc": "",
+            "longDesc": "",
             "links": []
         })
     return items
