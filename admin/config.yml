@@ -76,6 +76,7 @@ collections:
               - label: "항목들"
                 name: items
                 widget: list
+                summary: "{{fields.text}}"
                 field: { label: "내용", name: text, widget: string }
 
   # ──────────────────────────────────────────────────
