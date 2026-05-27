@@ -29,7 +29,7 @@
     <div class="about-row">
       <div class="about-label">Profile</div>
       <div class="about-body">
-        <p class="name">홍길동</p>
+        <p class="name">소영</p>
         <p>Product designer · 데이터 중심 엔터프라이즈 UI를 디자인합니다.</p>
       </div>
     </div>
@@ -38,8 +38,7 @@
       <div class="about-label">Experience</div>
       <div class="about-body">
         <ul>
-          <li>20년차 디자이너 · 공공·금융·통신 영역</li>
-          <li>자유 텍스트 한 줄 (회사·직책 없음)</li>
+          <li>2002.08.14~현재 IT Solution 회사 연구소 디자이너 재직중</li>
           <li>자유 텍스트 한 줄</li>
         </ul>
       </div>
@@ -71,5 +70,18 @@
   <footer class="footer">© Drawer · noindex</footer>
 
   <script src="js/main.js"></script>
+
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script>
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.on("init", user => {
+        if (!user) {
+          window.netlifyIdentity.on("login", () => {
+            document.location.href = "/admin/";
+          });
+        }
+      });
+    }
+  </script>
 </body>
 </html>

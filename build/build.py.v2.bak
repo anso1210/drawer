@@ -1,10 +1,23 @@
 #!/usr/bin/env python3
 """
-Drawer · Build script v3
-v3 변경:
-  - 첫 카테고리 → index.html 자동 출력 (첫 화면 = dashboard)
-  - items.json thumb 자동 매칭 (name 기반)
-  - 모든 페이지에 Netlify Identity widget inject
+Drawer · Build script v2
+===================================
+img/ 폴더 트리 = SSOT.
+폴더 추가/삭제/이름변경 → 빌드 한 번으로 메뉴·페이지·콘텐츠 모두 자동 반영.
+
+v2 추가:
+  - content/about.json → about.html 생성 (있을 때만, 없으면 기존 정적 유지)
+  - items.json 형식 자동 마이그레이션 (array → {"items": [...]}, Decap CMS 호환)
+
+규칙:
+  - 1단 폴더 prefix(01-, 02-)는 정렬 전용, 라벨에서 제거
+  - 한글 폴더/파일명 NFD → NFC 자동 정규화
+  - AI App 카테고리(폴더명에 'ai_app' 또는 'ai-app' 포함):
+      → list view (썸네일 + 제목 + 설명 + 액션)
+      → items.json 없으면 자동 생성 (사용자가 desc/links 편집)
+  - 그 외 카테고리:
+      → grid view (이미지 재귀 스캔)
+      → items.json 직접 두면 list view로 전환 가능
 """
 
 import html
@@ -26,38 +39,15 @@ HIDDEN_RE = re.compile(r"^[._]")
 AI_APP_RE = re.compile(r"ai[-_]?app", re.IGNORECASE)
 
 
-IDENTITY_WIDGET = """
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  <script>
-    if (window.netlifyIdentity) {
-      window.netlifyIdentity.on("init", user => {
-        if (!user) {
-          window.netlifyIdentity.on("login", () => {
-            document.location.href = "/admin/";
-          });
-        }
-      });
-    }
-  </script>"""
-
-
-def inject_identity_widget(content):
-    return content.replace("</body>", IDENTITY_WIDGET + "\n</body>", 1)
-
-
-def normalize_for_match(s):
-    return re.sub(r"[^a-z0-9]", "", s.lower())
-
-
-def nfc(s):
+def nfc(s: str) -> str:
     return unicodedata.normalize("NFC", s)
 
 
-def is_visible(name):
+def is_visible(name: str) -> bool:
     return not HIDDEN_RE.match(name)
 
 
-def label_from_folder(name):
+def label_from_folder(name: str) -> str:
     base = re.sub(r"^\d+[-_]", "", name)
     words = re.split(r"[_\s-]+", base)
     out = []
@@ -73,7 +63,8 @@ def label_from_folder(name):
     return " ".join(out)
 
 
-def name_from_filename(filename):
+def name_from_filename(filename: str) -> str:
+    """파일명 → 항목 이름 (자동 변환). 예: '01-jobposting.png' → 'Jobposting'"""
     stem = Path(filename).stem
     stem = re.sub(r"^\d+[-_]", "", stem)
     stem = re.sub(r"[_-]+", " ", stem)
@@ -89,13 +80,13 @@ def name_from_filename(filename):
     return " ".join(out) if out else stem
 
 
-def url_slug(name):
+def url_slug(name: str) -> str:
     base = re.sub(r"^\d+[-_]", "", name)
     slug = re.sub(r"[_\s]+", "-", base).lower()
     return slug + ".html"
 
 
-def scan_images(folder):
+def scan_images(folder: Path):
     items = []
     for dirpath, dirnames, filenames in os.walk(folder):
         dirnames[:] = sorted([nfc(d) for d in dirnames if is_visible(d)])
@@ -109,15 +100,16 @@ def scan_images(folder):
     return items
 
 
-def load_items_json(path):
+def load_items_json(path: Path):
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
         changed = False
 
+        # v2 마이그레이션: array → {"items": [...]} (Decap CMS 호환)
         if isinstance(data, list):
             data = {"items": data}
             changed = True
-            print(f"  ↻ items.json 마이그레이션 ({path.parent.name}): array → object")
+            print(f"  ↻ items.json 마이그레이션 ({path.parent.name}): array → object 래핑")
 
         if not isinstance(data, dict):
             data = {"items": []}
@@ -129,6 +121,7 @@ def load_items_json(path):
             data["items"] = items
             changed = True
 
+        # 기존 마이그레이션: 항목에 longDesc/desc/links 필드 자동 추가
         for item in items:
             if isinstance(item, dict):
                 if "longDesc" not in item:
@@ -140,49 +133,6 @@ def load_items_json(path):
                 if "links" not in item:
                     item["links"] = []
                     changed = True
-
-        # v3: thumb 자동 매칭
-        folder = path.parent
-        try:
-            available_images = sorted([
-                f.name for f in folder.iterdir()
-                if f.is_file() and IMAGE_RE.search(f.name) and is_visible(f.name)
-            ])
-        except OSError:
-            available_images = []
-
-        used_files = set()
-        for item in items:
-            if not isinstance(item, dict):
-                continue
-            thumb = item.get("thumb", "")
-            if thumb:
-                tb = Path(thumb).name
-                if (folder / tb).exists():
-                    used_files.add(tb)
-
-        for item in items:
-            if not isinstance(item, dict):
-                continue
-            thumb = item.get("thumb", "")
-            if thumb and (folder / Path(thumb).name).exists():
-                continue
-            item_norm = normalize_for_match(item.get("name", ""))
-            if not item_norm:
-                continue
-            matched = None
-            for img_name in available_images:
-                if img_name in used_files:
-                    continue
-                img_stem_norm = normalize_for_match(Path(img_name).stem)
-                if item_norm in img_stem_norm or img_stem_norm in item_norm:
-                    matched = img_name
-                    break
-            if matched:
-                item["thumb"] = matched
-                used_files.add(matched)
-                changed = True
-                print(f"  ↻ thumb 매칭 ({folder.name}): '{item.get('name', '?')}' → {matched}")
 
         if changed:
             path.write_text(
@@ -196,7 +146,8 @@ def load_items_json(path):
         return []
 
 
-def autogen_items_for_ai_app(folder, images):
+def autogen_items_for_ai_app(folder: Path, images: list) -> list:
+    """AI App 카테고리에 items.json 없을 때 자동 생성."""
     items = []
     for img_rel in images:
         items.append({
@@ -249,6 +200,10 @@ CATEGORY_TEMPLATE = """<!DOCTYPE html>
 """
 
 
+# ──────────────────────────────────────────────────────────────
+# v2: About 페이지 빌드 (content/about.json → about.html)
+# ──────────────────────────────────────────────────────────────
+
 ABOUT_TEMPLATE = """<!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -295,7 +250,7 @@ ABOUT_TEMPLATE = """<!DOCTYPE html>
 """
 
 
-def render_about_section(section):
+def render_about_section(section: dict) -> str:
     label = html.escape(section.get("label", ""))
     type_ = section.get("type", "list")
     items = section.get("items", []) or []
@@ -305,7 +260,7 @@ def render_about_section(section):
             f"          <span>{html.escape(str(i))}</span>" for i in items
         )
         body = f'<div class="tool-tags">\n{tags}\n        </div>'
-    else:
+    else:  # list (default)
         lis = "\n".join(
             f"          <li>{html.escape(str(i))}</li>" for i in items
         )
@@ -321,6 +276,7 @@ def render_about_section(section):
 
 
 def build_about():
+    """content/about.json이 있으면 about.html 생성. 없으면 기존 about.html 그대로 둠."""
     data_path = CONTENT_DIR / "about.json"
     if not data_path.exists():
         return False
@@ -342,9 +298,11 @@ def build_about():
         sections_html=sections_html,
     )
 
-    html_out = inject_identity_widget(html_out)
     (ROOT / "about.html").write_text(html_out, encoding="utf-8")
     return True
+
+
+# ──────────────────────────────────────────────────────────────
 
 
 def build():
@@ -360,6 +318,7 @@ def build():
     categories = []
     generated_pages = []
 
+    # v2: about.html은 content/about.json이 있으면 빌드 산출물이 됨
     about_built = build_about()
     PROTECTED = {"index.html"}
     if not about_built:
@@ -369,7 +328,7 @@ def build():
         if f.name not in PROTECTED and f.name != "about.html":
             f.unlink()
 
-    for idx, folder_name in enumerate(folders):
+    for folder_name in folders:
         folder = IMG_DIR / folder_name
         items_json = folder / "items.json"
         is_ai_app = bool(AI_APP_RE.search(folder_name))
@@ -378,8 +337,10 @@ def build():
             view = "list"
             items = load_items_json(items_json)
         elif is_ai_app:
+            # AI App 폴더 + items.json 없음 → 자동 생성
             images = scan_images(folder)
             items = autogen_items_for_ai_app(folder, images)
+            # v2: 새 형식 ({"items": [...]})으로 저장
             items_json.write_text(
                 json.dumps({"items": items}, ensure_ascii=False, indent=2),
                 encoding="utf-8",
@@ -402,20 +363,16 @@ def build():
         }
         categories.append(cat)
 
-        page_html = CATEGORY_TEMPLATE.format(
-            label=label,
-            slug=slug,
-            label_upper=label.upper(),
-        )
-        page_html = inject_identity_widget(page_html)
         page_path = ROOT / cat["url"]
-        page_path.write_text(page_html, encoding="utf-8")
+        page_path.write_text(
+            CATEGORY_TEMPLATE.format(
+                label=label,
+                slug=slug,
+                label_upper=label.upper(),
+            ),
+            encoding="utf-8",
+        )
         generated_pages.append(cat["url"])
-
-        # v3: 첫 카테고리 → index.html도 동일 내용
-        if idx == 0:
-            (ROOT / "index.html").write_text(page_html, encoding="utf-8")
-            generated_pages.append(f"index.html (= {cat['url']})")
 
         count = len(items)
         empty = " (empty)" if count == 0 else ""
@@ -432,13 +389,13 @@ def build():
         encoding="utf-8",
     )
 
-    about_status = "from content/about.json" if about_built else "static"
+    about_status = "from content/about.json" if about_built else "static (정적 그대로)"
 
     print(f"\n✅ 빌드 완료")
-    print(f"   카테고리       : {len(categories)}")
-    print(f"   생성된 페이지   : {len(generated_pages)}개")
-    print(f"   첫 화면        : index.html = {folders[0] if folders else '(없음)'}")
-    print(f"   about.html     : {about_status}\n")
+    print(f"   manifest.json  : {len(categories)} 카테고리")
+    print(f"   생성된 페이지   : {', '.join(generated_pages) if generated_pages else '없음'}")
+    print(f"   about.html     : {about_status}")
+    print(f"   정적 페이지     : index.html\n")
 
 
 if __name__ == "__main__":

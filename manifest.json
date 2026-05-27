@@ -91,28 +91,28 @@
       "view": "list",
       "items": [
         {
-          "thumb": "01-jobposting.png",
+          "thumb": "01-Job-Posting-Builder.png",
           "name": "Jobposting",
           "desc": "",
           "links": [],
           "longDesc": ""
         },
         {
-          "thumb": "02-exceltohtml.png",
+          "thumb": "02-Excel-to-HTML.png",
           "name": "Exceltohtml",
           "desc": "",
           "links": [],
           "longDesc": ""
         },
         {
-          "thumb": "03-heatmap.png",
+          "thumb": "03-Heatmap-Painter.png",
           "name": "Heatmap",
           "desc": "",
           "links": [],
           "longDesc": ""
         },
         {
-          "thumb": "04-valueheatmap.png",
+          "thumb": "04-Value-Heatmap.png",
           "name": "Valueheatmap",
           "desc": "",
           "links": [],
