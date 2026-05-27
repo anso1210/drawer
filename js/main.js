@@ -159,9 +159,6 @@ function renderList(container, items, categoryId) {
       : `<div class="list-thumb-placeholder" aria-hidden="true"></div>`;
 
     const longDesc = (item.longDesc || '').trim();
-    const badgeHtml = (item.badge && item.badgeTone)
-      ? `<span class="list-badge" data-tone="${escapeAttr(item.badgeTone)}">${escapeHtml(item.badge)}</span>`
-      : '';
     const fullImage = thumbSrc
       ? `<img class="list-image-full" src="${escapeAttr(thumbSrc)}" alt="${escapeAttr(item.name || '')}" loading="lazy" draggable="false">`
       : '';
@@ -180,7 +177,6 @@ function renderList(container, items, categoryId) {
         <button class="list-head" type="button" aria-expanded="false" aria-controls="${panelId}">
           ${thumbHtml}
           <div class="list-body">
-            ${badgeHtml}
             <h2 class="list-name">${escapeHtml(item.name || '')}</h2>
             <p class="list-desc">${escapeHtml(item.desc || '')}</p>
           </div>
