@@ -117,6 +117,13 @@
           "desc": "",
           "links": [],
           "longDesc": ""
+        },
+        {
+          "thumb": "05-Image-Resizer.png",
+          "name": "Image Resizer",
+          "desc": "",
+          "longDesc": "",
+          "links": []
         }
       ]
     }

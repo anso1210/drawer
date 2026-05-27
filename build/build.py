@@ -184,6 +184,21 @@ def load_items_json(path):
                 changed = True
                 print(f"  ↻ thumb 매칭 ({folder.name}): '{item.get('name', '?')}' → {matched}")
 
+        # v4: 폴더에 있는데 items에 없는 새 이미지 → 새 항목 자동 추가
+        for img_name in available_images:
+            if img_name not in used_files:
+                new_item = {
+                    "thumb": img_name,
+                    "name": name_from_filename(img_name),
+                    "desc": "",
+                    "longDesc": "",
+                    "links": []
+                }
+                items.append(new_item)
+                used_files.add(img_name)
+                changed = True
+                print(f"  + 새 항목 자동 추가 ({folder.name}): {img_name} → {new_item['name']}")
+
         if changed:
             path.write_text(
                 json.dumps(data, ensure_ascii=False, indent=2),
