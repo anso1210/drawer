@@ -1,30 +1,32 @@
-[
-  {
-    "thumb": "01-jobposting.png",
-    "name": "Jobposting",
-    "desc": "",
-    "links": [],
-    "longDesc": ""
-  },
-  {
-    "thumb": "02-exceltohtml.png",
-    "name": "Exceltohtml",
-    "desc": "",
-    "links": [],
-    "longDesc": ""
-  },
-  {
-    "thumb": "03-heatmap.png",
-    "name": "Heatmap",
-    "desc": "",
-    "links": [],
-    "longDesc": ""
-  },
-  {
-    "thumb": "04-valueheatmap.png",
-    "name": "Valueheatmap",
-    "desc": "",
-    "links": [],
-    "longDesc": ""
-  }
-]
+{
+  "items": [
+    {
+      "thumb": "01-jobposting.png",
+      "name": "Jobposting",
+      "desc": "",
+      "links": [],
+      "longDesc": ""
+    },
+    {
+      "thumb": "02-exceltohtml.png",
+      "name": "Exceltohtml",
+      "desc": "",
+      "links": [],
+      "longDesc": ""
+    },
+    {
+      "thumb": "03-heatmap.png",
+      "name": "Heatmap",
+      "desc": "",
+      "links": [],
+      "longDesc": ""
+    },
+    {
+      "thumb": "04-valueheatmap.png",
+      "name": "Valueheatmap",
+      "desc": "",
+      "links": [],
+      "longDesc": ""
+    }
+  ]
+}

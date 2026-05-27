@@ -1,0 +1,37 @@
+{
+  "profile": {
+    "name": "홍길동",
+    "tagline": "Product designer · 데이터 중심 엔터프라이즈 UI를 디자인합니다."
+  },
+  "sections": [
+    {
+      "label": "Experience",
+      "type": "list",
+      "items": [
+        "20년차 디자이너 · 공공·금융·통신 영역",
+        "자유 텍스트 한 줄 (회사·직책 없음)",
+        "자유 텍스트 한 줄"
+      ]
+    },
+    {
+      "label": "Selected works",
+      "type": "list",
+      "items": [
+        "자유 텍스트 한 줄",
+        "자유 텍스트 한 줄"
+      ]
+    },
+    {
+      "label": "Tools",
+      "type": "tags",
+      "items": [
+        "Figma",
+        "Sketch",
+        "Photoshop",
+        "Illustrator",
+        "After Effects",
+        "Blender"
+      ]
+    }
+  ]
+}

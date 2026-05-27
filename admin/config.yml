@@ -1,0 +1,173 @@
+# Decap CMS · drawer
+# 문서: https://decapcms.org/docs/configuration-options/
+# 이 파일을 수정한 뒤 git push하면 admin UI에 즉시 반영됩니다.
+
+backend:
+  name: github
+  repo: anso1210/drawer
+  branch: main
+  # PKCE flow: OAuth proxy 서버 없이 GitHub 인증
+  auth_type: pkce
+  app_id: Ov23li9OxRoy3GcxBJG8
+  commit_messages:
+    create: 'content: create {{collection}} "{{slug}}"'
+    update: 'content: update {{collection}} "{{slug}}"'
+    delete: 'content: delete {{collection}} "{{slug}}"'
+    uploadMedia: 'media: upload "{{path}}"'
+    deleteMedia: 'media: delete "{{path}}"'
+
+publish_mode: simple
+locale: ko
+
+slug:
+  encoding: ascii
+  clean_accents: true
+  sanitize_replacement: "-"
+
+# 전역 미디어 폴더 (collection별로 override됨)
+media_folder: "img/uploads"
+public_folder: "/img/uploads"
+
+show_preview_links: false
+
+collections:
+  # ──────────────────────────────────────────────────
+  # 1. About 페이지
+  # ──────────────────────────────────────────────────
+  - name: about
+    label: "About 페이지"
+    description: "이름 · 소개 · 경력 · 도구. 모든 텍스트 편집 가능."
+    files:
+      - name: about
+        label: "About 내용"
+        file: content/about.json
+        format: json
+        fields:
+          # Profile (고정: 항상 노출, 삭제 불가)
+          - label: "프로필"
+            name: profile
+            widget: object
+            collapsed: false
+            fields:
+              - label: "이름"
+                name: name
+                widget: string
+                hint: "About 페이지 상단의 큰 글씨"
+              - label: "한 줄 소개"
+                name: tagline
+                widget: string
+                hint: "이름 아래 회색 텍스트 한 줄"
+
+          # Sections (가변: 추가·삭제·순서변경 자유)
+          - label: "섹션 (추가/삭제/순서 변경 가능)"
+            name: sections
+            widget: list
+            label_singular: "섹션"
+            summary: "{{fields.label}}"
+            collapsed: false
+            fields:
+              - label: "섹션 제목"
+                name: label
+                widget: string
+                hint: "예: Experience, Selected works, Tools"
+              - label: "표시 방식"
+                name: type
+                widget: select
+                default: list
+                options:
+                  - { label: "리스트 (한 줄씩)", value: list }
+                  - { label: "태그 (칩 형태)", value: tags }
+              - label: "항목들"
+                name: items
+                widget: list
+                field: { label: "내용", name: text, widget: string }
+
+  # ──────────────────────────────────────────────────
+  # 2. AI App 프로젝트 목록
+  # ──────────────────────────────────────────────────
+  - name: ai_app
+    label: "AI App 프로젝트"
+    description: "AI App 페이지에 리스트로 표시되는 프로젝트들"
+    media_folder: "/img/03-ai_app"
+    public_folder: "/img/03-ai_app"
+    files:
+      - name: items
+        label: "프로젝트 목록"
+        file: img/03-ai_app/items.json
+        format: json
+        fields:
+          - label: "프로젝트들"
+            name: items
+            widget: list
+            label_singular: "프로젝트"
+            summary: "{{fields.name}}"
+            fields:
+              - label: "이름"
+                name: name
+                widget: string
+              - label: "한 줄 설명"
+                name: desc
+                widget: string
+                required: false
+              - label: "상세 설명"
+                name: longDesc
+                widget: text
+                required: false
+                hint: "상세 보기에 표시되는 긴 설명 (선택)"
+              - label: "썸네일 이미지"
+                name: thumb
+                widget: image
+                required: false
+                hint: "img/03-ai_app 폴더에 자동 저장"
+              - label: "링크"
+                name: links
+                widget: list
+                required: false
+                summary: "{{fields.label}} → {{fields.url}}"
+                fields:
+                  - { label: "라벨", name: label, widget: string }
+                  - { label: "URL", name: url, widget: string }
+
+  # ──────────────────────────────────────────────────
+  # 3. Dashboard 이미지
+  # ──────────────────────────────────────────────────
+  - name: dashboard
+    label: "Dashboard 이미지"
+    description: "Dashboard 메뉴 그리드에 표시되는 이미지들"
+    media_folder: "/img/01-dashboard"
+    public_folder: "/img/01-dashboard"
+    files:
+      - name: dashboard_images
+        label: "이미지 추가"
+        file: content/dashboard-images.json
+        format: json
+        fields:
+          - label: "이미지들"
+            name: images
+            widget: list
+            label_singular: "이미지"
+            required: false
+            hint: "여기에 추가한 이미지는 img/01-dashboard 폴더에 저장됩니다. 빌드 후 Dashboard 페이지에 자동 표시."
+            field: { label: "이미지", name: src, widget: image }
+
+  # ──────────────────────────────────────────────────
+  # 4. 3D 이미지
+  # ──────────────────────────────────────────────────
+  - name: threed
+    label: "3D 이미지"
+    description: "3D 메뉴 그리드에 표시되는 이미지들"
+    media_folder: "/img/02-3d"
+    public_folder: "/img/02-3d"
+    files:
+      - name: threed_images
+        label: "이미지 추가"
+        file: content/threed-images.json
+        format: json
+        fields:
+          - label: "이미지들"
+            name: images
+            widget: list
+            label_singular: "이미지"
+            required: false
+            hint: "여기에 추가한 이미지는 img/02-3d 폴더에 저장됩니다."
+            field: { label: "이미지", name: src, widget: image }
