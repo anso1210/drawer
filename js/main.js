@@ -40,9 +40,11 @@ function renderMenu(manifest, currentPage) {
   items.push({ label: 'About', url: 'about.html', active: currentPage === 'about' });
 
   if (header) {
-    header.innerHTML = items.map(i =>
+    const menuHtml = items.map(i =>
       `<a href="${i.url}"${i.active ? ' class="active"' : ''}>${escapeHtml(i.label)}</a>`
     ).join('');
+    const userIconHtml = `<a href="/admin/" class="header-user" aria-label="관리자" title="관리자" style="margin-left: 1.5rem; opacity: 0.5; display: inline-flex; align-items: center; vertical-align: middle;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>`;
+    header.innerHTML = menuHtml + userIconHtml;
   }
   if (mobile) {
     const homeActive = currentPage === 'index' ? ' class="active"' : '';
@@ -50,7 +52,8 @@ function renderMenu(manifest, currentPage) {
       `<a href="index.html"${homeActive}>Home</a>` +
       items.map(i =>
         `<a href="${i.url}"${i.active ? ' class="active"' : ''}>${escapeHtml(i.label)}</a>`
-      ).join('');
+      ).join('') +
+      `<a href="/admin/" class="mobile-user">관리자</a>`;
   }
 }
 
