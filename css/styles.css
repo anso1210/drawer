@@ -331,11 +331,11 @@ a { color: inherit; }
   font-size: 25px;
   font-weight: 500;
   letter-spacing: -0.01em;
-  margin: 0 0 8px;
+  margin: 0 0 3px;
   color: var(--text-primary);
 }
 .list-desc {
-  font-size: 13px;
+  font-size: clamp(11px, 1.0vw, 13px);
   color: rgba(255, 255, 255, 0.72);
   margin: 0;
   line-height: 1.7;
