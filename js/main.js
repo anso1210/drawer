@@ -123,6 +123,8 @@ function updateMeta(manifest, page) {
     metaEl.textContent = `${manifest.totalItems} items`;
   } else if (page === 'about') {
     return;
+  } else if (page === 'ai-app') {
+    metaEl.textContent = 'built with chatgpt & claude';
   } else {
     const cat = findCategory(manifest, page);
     if (cat) {
